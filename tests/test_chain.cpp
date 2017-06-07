@@ -27,7 +27,7 @@ uint8_t count_bits(uint8_t b) {
     return count;
 }
 
-void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::puncturing::conf_t pconf, float sigma) {
+void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::puncturing::conf_t pconf, float sigma, bool verbose) {
     
     //
     //// Generate paths to generator and parity check matrix
@@ -44,8 +44,10 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     strcat(filename_par, code_name);
     strcat(filename_par, ".a");
     
-    printf("  using generator matrix from    %s\n", filename_gen);
-    printf("  using parity check matrix from %s\n", filename_par);
+    if(verbose) {
+        printf("  using generator matrix from    %s\n", filename_gen);
+        printf("  using parity check matrix from %s\n", filename_par);
+    }
     
     //
     //// Create encoder and decoder
@@ -90,6 +92,7 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     
     size_t i, j;
     uint8_t tmp_byte, tmp_bit;
+    ldpc::softbit_t tmp_softbit;
     std::default_random_engine gen;
     std::uniform_int_distribution<uint8_t> rng_uint8(0,255);
     std::normal_distribution<ldpc::softbit_t> rng_softbit_normal(0.0f,sigma);
@@ -117,8 +120,11 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     //
     //// Add noise
     //
+    //printf("noise vector: ");
     for(i=0; i<M_punct; i++) {
-        sym_recv[i] = sym_send[i] + rng_softbit_normal(gen);
+        tmp_softbit = rng_softbit_normal(gen);
+        //printf("%f ", tmp_softbit);
+        sym_recv[i] = sym_send[i] + tmp_softbit;
         mask_ber[i] = (sym_recv[i]*sym_send[i] < 0.0f);
     }
     
@@ -132,8 +138,13 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     //
     //// Decoder
     //
-    //dec.decode(sbits_dec, sbits_recv, &meta, "/tmp/decoder_tree.txt");
-    dec.decode(sbits_dec, sbits_recv, &meta);
+    sbits_recv[245] = 1.0f/0.0f;
+    sbits_recv[1251] = -1.0f/0.0f;
+    if(verbose) {
+        dec.decode(sbits_dec, sbits_recv, &meta, "/tmp/decoder_tree.txt");
+    } else {
+        dec.decode(sbits_dec, sbits_recv, &meta);
+    }
     
     /*
     for(i=0; i<100; i++) {
@@ -162,36 +173,60 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     //// Status output
     //
     
-    if(meta.num_corrected > 0) {
-        printf("Send => Encoded => Decoded\n");
-        for(i=0; i<K_bytes; i++) {
-            printf("Bit % 4u - % 4u: %02X => %02X => %02X\n", i*8, i*8+7, data_send[i], data_encoded[i], data_dec[i]);
+    if(verbose) {
+        if(meta.success && ber_counter > 0) {
+            printf("Send => Encoded => Decoded\n");
+            for(i=0; i<K_bytes; i++) {
+                printf("Bit % 4u - % 4u: %02X => %02X => %02X  (%s)\n", i*8, i*8+7, data_send[i], data_encoded[i], data_dec[i], (data_send[i]==data_dec[i]) ? "ok" : "FAILURE");
+            }
         }
+        
+        for(i=0; i<K; i++) {
+            sym_ber_counter_bits += mask_ber[i] ? 1 : 0;
+        }
+        for(i=0; i<M_punct; i++) {
+            sym_ber_counter_total += mask_ber[i] ? 1 : 0;
+        }
+        
+        printf("Decoding %s after %u iterations. %u/%lu bits corrected.\n", meta.success ? "SUCCESSFUL" : "FAILED", meta.num_iterations, meta.num_corrected, sym_ber_counter_total);
+        
+        printf("Send and decoded information differ in %u bits ===============> Test %s.\n", ber_counter, (ber_counter==0) ? "PASSED" : "FAILED");
     }
-    
-    printf("Decoding %s after %u iterations. %u bits corrected.\n", meta.success ? "SUCCESSFUL" : "FAILED", meta.num_iterations, meta.num_corrected);
-    
-    for(i=0; i<K; i++) {
-        sym_ber_counter_bits += mask_ber[i] ? 1 : 0;
-    }
-    for(i=0; i<M_punct; i++) {
-        sym_ber_counter_total += mask_ber[i] ? 1 : 0;
-    }
-    printf("Simulation introduced %u BERs in total.\n%u bits were changed in information part, send and decoded information differ in %u bits.\n", sym_ber_counter_total, sym_ber_counter_bits, ber_counter);
-    
     
 }
 
 int main(void) {
+    float sigma;
     
-    printf("Testing rate 1/2 k=1024 block code without noise.\n");
-    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), 0.0f);
     
     /*
+    sigma = 0.0f;
+    printf("Testing rate 1/2 k=1024 block code without noise.\n");
+    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, true);
+    //*/
+    
+    /*
+    sigma = 0.56;
     printf("\n\n");
-    printf("Testing rate 1/2 k=1024 block code with sigma 0.1.\n");
-    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), 0.1f);
+    printf("Testing rate 1/2 k=1024 block code with sigma %f.\n", sigma);
+    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, true);
     ///*/
+    
+    /*
+    sigma = 0.55;
+    printf("\n\n");
+    printf("Testing rate 1/2 k=1024 block code with sigma %f.\n", sigma);
+    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, true);
+    ///*/
+
+
+    sigma = 0.55;
+    for(size_t i=1; i<=10000; i++) {
+	if(i%1000==0) {
+	    printf("1000 runs completed\n");
+	}
+        test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, false);
+    }
     
     printf("Finished.\n");
 }

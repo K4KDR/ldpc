@@ -1,6 +1,5 @@
-test_encoder.o
-test_decoder.o
-test_chain.o
+*.o
 test_encoder
 test_decoder
 test_chain
+test_benchmark

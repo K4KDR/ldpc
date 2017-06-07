@@ -5,6 +5,8 @@
 #include <math.h>
 #include <stdint.h>
 
+#define LDPC_DO_SANITY_CHECKS true
+
 namespace ldpc {
     
     typedef float softbit_t;
@@ -41,7 +43,9 @@ namespace ldpc {
     
     softbit_t addllrs(const softbit_t val1, softbit_t val2);
     
-    softbit_t my_abs(const softbit_t v);
+    inline softbit_t my_abs(const softbit_t v) {
+        return (v>=0.0f) ? v : -v;
+    }
 }
 
 #endif /* __LIBLDPC_LDPC_H__DEFINED__ */

@@ -84,10 +84,11 @@ ldpc::softbit_t ldpc::addllrs(const softbit_t val1, softbit_t val2) {
     }
 }
 
-ldpc::softbit_t ldpc::my_abs(const softbit_t v) {
-    if(v >= 0.0f) {
+//inline ldpc::softbit_t ldpc::my_abs(const softbit_t v) {
+//    return (v>=0.0f) ? v : -v;
+    /*if(v >= 0.0f) {
         return v;
     } else {
         return -v;
-    }
-}
+    }*/
+//}
