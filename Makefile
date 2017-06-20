@@ -5,8 +5,14 @@ CFLAGS=-fPIC -Wall -Wformat=0 -O5 -I./include/
 
 PREFIX=/usr/local/
 
-%.o: %.cpp include/ldpc/%.h include/ldpc/ldpc.h $
-	$(CC) $(CFLAGS) -c -o $@ $< 
+ldpc.o: ldpc.cpp include/ldpc/ldpc.h
+	$(CC) $(CFLAGS) -c -o ldpc.o ldpc.cpp
+
+encoder.o: encoder.cpp include/ldpc/encoder.h include/ldpc/ldpc.h
+	$(CC) $(CFLAGS) -c -o encoder.o encoder.cpp
+
+decoder.o: decoder.cpp include/ldpc/decoder.h include/ldpc/ldpc.h
+	$(CC) $(CFLAGS) -c -o decoder.o decoder.cpp
 
 all: libldpc
 
