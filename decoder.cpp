@@ -580,6 +580,7 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
 ldpc::decoder::check_node::check_node(const uint64_t NUM_BITS) : NUM_BITS(NUM_BITS) {
     this->bit_values_tanh = new softbit_t[NUM_BITS];
     this->tmp_indx = 0;
+    this->new_round();
 }
 
 ldpc::decoder::check_node::~check_node(void) {
@@ -625,6 +626,8 @@ ldpc::softbit_t ldpc::decoder::check_node::computeValForMessage(uint64_t indx) c
 ////
 ldpc::decoder::bit_node::bit_node(const uint64_t NUM_CHECKS) : NUM_CHECKS(NUM_CHECKS){
     this->check_values = new softbit_t[NUM_CHECKS];
+    this->tmp_indx = 0;
+    this->new_round();
 }
 
 ldpc::decoder::bit_node::~bit_node(void){
