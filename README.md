@@ -13,7 +13,7 @@ This repository contains:
 The library build process is controlled by make. A typical setup can be performed with
 ````
 cd libldpc
-make
+make all
 sudo make install
 ````
 
@@ -38,7 +38,7 @@ This application depends on the NTL library, that has to be installed.
 The build process is controlled by Make.
 ````
 cd libldpc/compute_gen
-make all
+make
 sudo make install
 ````
 
