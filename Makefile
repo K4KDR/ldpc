@@ -5,6 +5,9 @@ CFLAGS=-fPIC -Wall -Wformat=0 -O5 -I./include/
 
 PREFIX=/usr/local/
 
+.PHONY: default
+default: libldpc ;
+
 ldpc.o: ldpc.cpp include/ldpc/ldpc.h
 	$(CC) $(CFLAGS) -c -o ldpc.o ldpc.cpp
 
