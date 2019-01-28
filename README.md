@@ -38,7 +38,7 @@ This application depends on the NTL library, that has to be installed.
 The build process is controlled by Make.
 ````
 cd libldpc/compute_gen
-make
+make all
 sudo make install
 ````
 
