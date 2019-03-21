@@ -76,7 +76,7 @@ encoder::encoder(const char* generator_file, systematic::systematic_t systype, p
         }
     }
     if(i_local!=this->N_punct) {
-        fprintf(stderr, "Allocated %u parity checks, but code has %u.\n", i_local, this->N_punct);
+        fprintf(stderr, "Allocated %lu parity checks, but code has %lu.\n", i_local, this->N_punct);
         exit( EXIT_FAILURE );
     }
     
@@ -135,7 +135,7 @@ uint8_t encoder::read_byte(FILE *fp, const char *descr) {
     uint8_t buf;
     
     if(fread(&buf, sizeof(uint8_t), 1, fp) != 1) {
-        fprintf(stderr, "Unable to read byte for %s.\n");
+        fprintf(stderr, "Unable to read byte for %s.\n", descr);
         exit( EXIT_FAILURE );
     }
     

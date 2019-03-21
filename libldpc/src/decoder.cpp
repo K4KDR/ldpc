@@ -401,7 +401,7 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
                             syndrome_num_fulfilled++;
                         }
                         if(contains_punct) {
-                            printf("Syndrome %u is defined although it contains punctured bits.\n", check_indx);
+                            printf("Syndrome %lu is defined although it contains punctured bits.\n", check_indx);
                         }
                     } else {
                         syndrome_num_undef++;
@@ -412,10 +412,10 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
 	    
             if(debugout) {
                     printf("== Check results: ==\n");
-                    printf("  %4u checks SUCCEDED\n", syndrome_num_fulfilled);
-                    printf("  %4u checks FAILED\n", syndrome_num_failed);
-                    printf("  %4u checks are undefined due to puncturing\n", syndrome_num_undef_punct);
-                    printf("  %4u checks are undefined due to receiving undefined bits\n", syndrome_num_undef-syndrome_num_undef_punct);
+                    printf("  %4lu checks SUCCEDED\n", syndrome_num_fulfilled);
+                    printf("  %4lu checks FAILED\n", syndrome_num_failed);
+                    printf("  %4lu checks are undefined due to puncturing\n", syndrome_num_undef_punct);
+                    printf("  %4lu checks are undefined due to receiving undefined bits\n", syndrome_num_undef-syndrome_num_undef_punct);
                     printf("====================\n");
             }
         }
@@ -465,7 +465,7 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
                 fprintf(debugf, "%f ", ldpc::llr2prob(this->bit_nodes[bit_indx]->get_buffered_final_value()));
             }
             fprintf(debugf, "\n");
-            printf("  decoding round %4u/%4u, %4u syndrome errors, AWRM = %12lf (%4u/%4u), delta LLRs=%12le.\n", iteration_counter, DECODER_MAX_ITERATIONS, syndrome_count, awrm_tmp, awrm_counter, DECODER_MAX_AWRM_ITERATIONS, delta_bits_sum);
+            printf("  decoding round %4lu/%4u, %4lu syndrome errors, AWRM = %12lf (%4lu/%4u), delta LLRs=%12le.\n", iteration_counter, DECODER_MAX_ITERATIONS, syndrome_count, awrm_tmp, awrm_counter, DECODER_MAX_AWRM_ITERATIONS, delta_bits_sum);
             
             /*
             if(syndrome_count > 0) {
@@ -590,7 +590,7 @@ ldpc::decoder::check_node::~check_node(void) {
 void ldpc::decoder::check_node::new_round(void) {
 #if LDPC_DO_SANITY_CHECKS
     if(this->tmp_indx != 0 && this->tmp_indx != this->NUM_BITS) {
-        fprintf(stderr, "Resetting parity check node, although not all values are read out (%u/%u)",this->tmp_indx, this->NUM_BITS );
+        fprintf(stderr, "Resetting parity check node, although not all values are read out (%lu/%lu)",this->tmp_indx, this->NUM_BITS );
         exit( EXIT_FAILURE );
     }
 #endif

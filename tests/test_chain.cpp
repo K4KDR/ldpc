@@ -65,12 +65,12 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     const uint64_t M_punct = dec.get_num_input();
     
     if((uint64_t)ceil(K/8.0) != K_bytes) {
-        fprintf(stderr, "Number of information bits is inconsistent between encoder (%u Bytes = %u bits) and decoder (%u bits)\n", K_bytes, K_bytes*8, K);
+        fprintf(stderr, "Number of information bits is inconsistent between encoder (%lu Bytes = %lu bits) and decoder (%lu bits)\n", K_bytes, K_bytes*8u, K);
         exit( EXIT_FAILURE );
     }
     
     if((uint64_t)ceil(M_punct/8.0) != M_punct_bytes) {
-        fprintf(stderr, "Number of total bits is inconsistent between encoder (%u Bytes = %u bits) and decoder (%u bits)\n", M_punct_bytes, M_punct_bytes*8, M_punct);
+        fprintf(stderr, "Number of total bits is inconsistent between encoder (%lu Bytes = %lu bits) and decoder (%lu bits)\n", M_punct_bytes, M_punct_bytes*8, M_punct);
         exit( EXIT_FAILURE );
     }
     
@@ -177,7 +177,7 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
         if(meta.success && ber_counter > 0) {
             printf("Send => Encoded => Decoded\n");
             for(i=0; i<K_bytes; i++) {
-                printf("Bit % 4u - % 4u: %02X => %02X => %02X  (%s)\n", i*8, i*8+7, data_send[i], data_encoded[i], data_dec[i], (data_send[i]==data_dec[i]) ? "ok" : "FAILURE");
+                printf("Bit %4lu - %4lu: %02X => %02X => %02X  (%s)\n", i*8, i*8+7, data_send[i], data_encoded[i], data_dec[i], (data_send[i]==data_dec[i]) ? "ok" : "FAILURE");
             }
         }
         
@@ -188,9 +188,9 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
             sym_ber_counter_total += mask_ber[i] ? 1 : 0;
         }
         
-        printf("Decoding %s after %u iterations. %u/%lu bits corrected.\n", meta.success ? "SUCCESSFUL" : "FAILED", meta.num_iterations, meta.num_corrected, sym_ber_counter_total);
+        printf("Decoding %s after %lu iterations. %lu/%lu bits corrected.\n", meta.success ? "SUCCESSFUL" : "FAILED", meta.num_iterations, meta.num_corrected, sym_ber_counter_total);
         
-        printf("Send and decoded information differ in %u bits ===============> Test %s.\n", ber_counter, (ber_counter==0) ? "PASSED" : "FAILED");
+        printf("Send and decoded information differ in %lu bits ===============> Test %s.\n", ber_counter, (ber_counter==0) ? "PASSED" : "FAILED");
     }
     
 }
@@ -199,20 +199,20 @@ int main(void) {
     float sigma;
     
     
-    /*
+    //*
     sigma = 0.0f;
     printf("Testing rate 1/2 k=1024 block code without noise.\n");
     test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, true);
     //*/
     
-    /*
+    //*
     sigma = 0.56;
     printf("\n\n");
     printf("Testing rate 1/2 k=1024 block code with sigma %f.\n", sigma);
     test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, true);
     ///*/
     
-    /*
+    //*
     sigma = 0.55;
     printf("\n\n");
     printf("Testing rate 1/2 k=1024 block code with sigma %f.\n", sigma);
@@ -220,13 +220,15 @@ int main(void) {
     ///*/
 
 
+    /*
     sigma = 0.55;
     for(size_t i=1; i<=10000; i++) {
-	if(i%1000==0) {
-	    printf("1000 runs completed\n");
-	}
+        if(i%1000==0) {
+            printf("1000 runs completed\n");
+        }
         test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, false);
     }
+    //*/
     
     printf("Finished.\n");
 }

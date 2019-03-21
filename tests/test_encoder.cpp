@@ -46,7 +46,7 @@ void test02(void) {
     printf("AR4JA_r12_k1024n:\n");
     
     for(size_t i=0; i<M_bytes; i++) {
-        printf("Bit % 4u - % 4u: %02X\n", i*8, i*8+7, buf_out[i]);
+        printf("Bit %4lu - %4lu: %02X\n", i*8, i*8+7, buf_out[i]);
     }
     
 }

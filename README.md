@@ -1,53 +1,50 @@
-# LDPC library
-*This library is not yet finished. Especially the decoder is known to be buggy, 
+# LDPC
+*This project is not yet finished. Especially the decoder is known to be buggy, 
 only use this for testing*
 
-C++ library to handle ldpc messages.
+C++ project to handle LDPC messages in the MOVE-II project.
 
 This repository contains:
 1. The core library
-2. Example applications
-3. Sample application to compute systematic generator matrices
+2. Unittests/ example applications
+3. (Optional) Application to compute systematic generator matrices
 
-## Core library
-The library build process is controlled by make. A typical setup can be performed with
+Each part is installed by cmake. The entire project can be build at once with
 ````
-cd libldpc
-make all
+cd ldpc
+mkdir build && cd build
+cmake ../
+make make test
 sudo make install
 ````
 
+In order to include the generator matrix computation programm (which requires
+NTL), change the cmake command in the above procedure to
+`cmake -DBUILD_GENERATOR=On ../`.
+
+## Core library (libldpc) ##
+The core library is a shared library that exports the two classes encoder and
+decoder. They can be included with `#include <ldpc/encoder.h>` and
+`#include <ldpc/decoder.h>`.
+
 ## Example applications
-Example applications using the library are available in the tests directory. They 
-can be build with the provided Makefile, placing the resulting binaries in the tests folder as well.
-````
-cd libldpc/tests
-make
-./test_encoder
-./test_decoder
-./test_chain
-````
+The unittests in the tests folder serve as demonstrations how to use the
+library. They can be run from the build folder with `make test`.
 
 ## Application to compute systematic generator matrix
-Based on a parity check matrix provided in the alist format the programm computes 
-a generator matrix, assuming that the code is a systematic code, where the input 
-bits are send before the computed check bits.
+The application `ldpc_compute_generator` computes a generator matrix from a
+given parity check matrix (in alist format). The application assumes that the
+code is a systematic code, where the input bits are send before the computed
+check bits.
 
 This application depends on the NTL library, that has to be installed.
 
-The build process is controlled by Make.
-````
-cd libldpc/compute_gen
-make
-sudo make install
-````
+In order to generate the binary output file (*.gen) that is required by the ldpc
+library, the binary needs to be called with 3 arguments. The first argument is
+the path to the alist file defining the parity check matrix. The second argument
+is a path where an ASCII version of the computed generator matrix is written to.
+The third argument is the path where the *.gen file will be written to.
 
-In order to generate the binary output file (*.gen) that is required by the ldpc 
-library, the ldpc_compute_gen binary needs to be called with 3 arguments. The 
-first argument is the path to the alist file defining the parity check matrix. 
-The second argument is a path where an ASCII version of the computed generator 
-matrix is written to. The third argument is the path where the *.gen file will be 
-written to.
 ````
-ldpc_compute_gen paritycheck_matrix.a generator.txt generator.gen
+ldpc_compute_generator paritycheck_matrix.a generator.txt generator.gen
 ````

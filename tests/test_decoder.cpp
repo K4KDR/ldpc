@@ -15,7 +15,7 @@ void test01(void) {
         buf_in[i] = ldpc::prob2llr(0.0f);
     }
     d.decode(buf_out, buf_in, &meta);
-    printf("Decoding %s after %u iterations. %u bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
+    printf("Decoding %s after %lu iterations. %lu bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
     //*/
     
     //*
@@ -27,7 +27,7 @@ void test01(void) {
         buf_in[i] = ldpc::prob2llr(0.0f);
     }
     d.decode(buf_out, buf_in, &meta);
-    printf("Decoding %s after %u iterations. %u bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
+    printf("Decoding %s after %lu iterations. %lu bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
     //*/
     
     //*
@@ -40,7 +40,7 @@ void test01(void) {
     }
     buf_in[5] = ldpc::prob2llr(0.0f);
     d.decode(buf_out, buf_in, &meta);
-    printf("Decoding %s after %u iterations. %u bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
+    printf("Decoding %s after %lu iterations. %lu bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
     //*/
 }
 
@@ -76,7 +76,7 @@ void test02(void) {
     //*/
     
     d.decode(buf_out, buf_in, &meta, "/tmp/decoding.txt");
-    printf("Decoding %s after %u iterations. %u bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
+    printf("Decoding %s after %lu iterations. %lu bits corrected.\n", meta.success ? "SUCCESSFULL" : "FAILED", meta.num_iterations, meta.num_corrected);
 }
 
 int main(void) {

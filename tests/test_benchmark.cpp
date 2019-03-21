@@ -63,12 +63,12 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     const uint64_t M_punct = dec.get_num_input();
     
     if((uint64_t)ceil(K/8.0) != K_bytes) {
-        fprintf(stderr, "Number of information bits is inconsistent between encoder (%u Bytes = %u bits) and decoder (%u bits)\n", K_bytes, K_bytes*8, K);
+        fprintf(stderr, "Number of information bits is inconsistent between encoder (%lu Bytes = %lu bits) and decoder (%lu bits)\n", K_bytes, K_bytes*8u, K);
         exit( EXIT_FAILURE );
     }
     
     if((uint64_t)ceil(M_punct/8.0) != M_punct_bytes) {
-        fprintf(stderr, "Number of total bits is inconsistent between encoder (%u Bytes = %u bits) and decoder (%u bits)\n", M_punct_bytes, M_punct_bytes*8, M_punct);
+        fprintf(stderr, "Number of total bits is inconsistent between encoder (%lu Bytes = %lu bits) and decoder (%lu bits)\n", M_punct_bytes, M_punct_bytes*8u, M_punct);
         exit( EXIT_FAILURE );
     }
     
@@ -94,7 +94,7 @@ void test(const char *code_name, ldpc::systematic::systematic_t systype, ldpc::p
     
     const uint64_t NUM_PROGRESS_BARS = 50;
     const uint64_t PROGRESS_PER_IT = NUM_ITERATIONS / NUM_PROGRESS_BARS;
-    printf(" |%-*s|\n", NUM_PROGRESS_BARS, "");
+    printf(" |%-*s|\n", static_cast<int>(NUM_PROGRESS_BARS), "");
     printf(" |");
     fflush(stdout);
     
@@ -178,8 +178,9 @@ int main(void) {
     float sigma;
     
     
+    constexpr uint64_t kNUM_ITERATIONS = 1000u;
     sigma = 0.05;
-    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, 100000);
+    test("AR4JA_r12_k1024n", ldpc::systematic::FRONT, ldpc::puncturing::conf_t(ldpc::puncturing::BACK, 512, NULL), sigma, kNUM_ITERATIONS);
     
     printf("Finished.\n");
 }
