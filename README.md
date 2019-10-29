@@ -1,12 +1,9 @@
 # LDPC
-*This project is not yet finished. Especially the decoder is known to be buggy, 
-only use this for testing*
-
 C++ project to handle LDPC messages in the MOVE-II project.
 
 This repository contains:
 1. The core library
-2. Unittests/ example applications
+2. (Optional) Unittests/ example applications (outdated)
 3. (Optional) Application to compute systematic generator matrices
 
 Each part is installed by cmake. The entire project can be build at once with
@@ -20,7 +17,7 @@ sudo make install
 
 In order to include the generator matrix computation programm (which requires
 NTL), change the cmake command in the above procedure to
-`cmake -DBUILD_GENERATOR=On ../`.
+`cmake -DLIBLDPC_BUILD_GENERATOR=On ../`.
 
 ## Core library (libldpc) ##
 The core library is a shared library that exports the two classes encoder and
@@ -29,7 +26,12 @@ decoder. They can be included with `#include <ldpc/encoder.h>` and
 
 ## Example applications
 The unittests in the tests folder serve as demonstrations how to use the
-library. They can be run from the build folder with `make test`.
+library. As of now they contain hardcoded paths to parity matrix and generator
+matrices. In order to use them these paths need to be adopted.
+
+The build of these examples can be enabled with the cmake option
+`-DLIBLDPC_UNITTESTS=On`. Afterwards they can be run from the build folder with
+`make test`.
 
 ## Application to compute systematic generator matrix
 The application `ldpc_compute_generator` computes a generator matrix from a
