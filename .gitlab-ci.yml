@@ -1,0 +1,47 @@
+stages:
+    - Compile
+
+variables:
+    IMAGE_PREFIX: "gitlab.lrz.de:5005/sdr/docker-images/"
+
+
+.tmpl_build: &tmpl_build
+    tags: [build]
+    dependencies: []
+    stage: Compile
+    script:
+        - mkdir build && cd build
+        - cmake -DLIBLDPC_BUILD_GENERATOR=${BUILD_GENERATOR} -DLIBLDPC_UNITTESTS=Off ../
+        - make
+
+
+########################################################################################################################
+#####
+#####  Stage: Compile
+#####
+########################################################################################################################
+
+Compile-Clang-with-gen:
+    <<: *tmpl_build
+    image: "${IMAGE_PREFIX}ubuntu-clang"
+    variables:
+        BUILD_GENERATOR: "On"
+
+Compile-Clang-without-gen:
+    <<: *tmpl_build
+    image: "${IMAGE_PREFIX}ubuntu-clang"
+    variables:
+        BUILD_GENERATOR: "Off"
+
+Compile-GCC-with-gen:
+    <<: *tmpl_build
+    image: "${IMAGE_PREFIX}ubuntu-gcc"
+    variables:
+        BUILD_GENERATOR: "On"
+
+Compile-GCC-without-gen:
+    <<: *tmpl_build
+    image: "${IMAGE_PREFIX}ubuntu-gcc"
+    variables:
+        BUILD_GENERATOR: "Off"
+
