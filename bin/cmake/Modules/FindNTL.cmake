@@ -52,6 +52,11 @@ find_package_handle_standard_args(NTL
     VERSION_VAR NTL_VERSION
 )
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+find_package(GMP REQUIRED)
+
 if(NTL_FOUND)
     set(NTL_INCLUDE_DIRS ${NTL_INCLUDE_DIR})
     set(NTL_LIBRARIES ${NTL_LIBRARY})
@@ -63,5 +68,6 @@ if(NTL_FOUND)
     set_target_properties(NTL::NTL PROPERTIES
         IMPORTED_LOCATION "${NTL_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${NTL_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "Threads::Threads;GMP::GMP"
     )
 endif()
