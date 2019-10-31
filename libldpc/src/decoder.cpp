@@ -2,8 +2,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <math.h>
-
+#include <cmath>
+#include <cassert>
+#include <limits>
 
 void ldpc::decoder::parse_alist(const char* alist_file) {
     FILE* f = fopen(alist_file, "r");
@@ -112,9 +113,6 @@ void ldpc::decoder::parse_numbers_from_file(uint64_t *ret, FILE *f, const char *
         if (errno == ERANGE){
             fprintf(stderr, "Read number is out of range.\n");
             exit( EXIT_FAILURE );
-        } else if(i<0) {
-            fprintf(stderr, "Number is negative.\n");
-            exit( EXIT_FAILURE );
         } else {
             // Value in range
             
@@ -166,6 +164,7 @@ ldpc::decoder::decoder(const char* alist_file, systematic::systematic_t systype,
         this->bit_nodes[i] = new bit_node(this->mlist_num[i]);
     }
     
+    bits_last_it = new softbit_t[this->M];
 }
 
 ldpc::decoder::~decoder() {
@@ -181,6 +180,7 @@ ldpc::decoder::~decoder() {
     delete[] this->mlist;
     delete[] this->mlist_num;
     
+    delete[] bits_last_it;
 }
 
 bool ldpc::decoder::get_syndrome(const uint64_t check_indx, bool *defined) const {
@@ -221,19 +221,22 @@ uint64_t ldpc::decoder::get_syndrome_count(void) const {
         // do not trust check nodes syndrome, because they do not contain the final bit falue estmates
         //count += (this->check_nodes[i]->isFullfilled()) ? 0 : 1;
         
-        count += (this->get_syndrome(i)) ? 1 : 0;
+        count += (this->get_syndrome(i)) ? 1u : 0u;
     }
     
     return count;
 }
 
 double ldpc::decoder::get_awrm(void) const {
+    //Asserts floating point compatibility at compile time
+    static_assert(std::numeric_limits<float>::is_iec559, "IEEE 754 required to support +/- infinity floats");
+
     double ret=0.0;
     double e_i;
     double s_j;
     double abs_yi;
     double w_ij_tmp;
-    double w_ij = 1.0/0.0;
+    double w_ij = std::numeric_limits<float>::infinity();
     uint64_t j_indx, j;
     uint64_t k_indx, k;
     
@@ -247,7 +250,7 @@ double ldpc::decoder::get_awrm(void) const {
             j=this->mlist[i][j_indx]-1;
             s_j = (this->get_syndrome(j)) ? 0.0 : 1.0;
             
-            w_ij = 1.0/0.0; // +inf
+            w_ij = std::numeric_limits<float>::infinity();
             for(k_indx=0; k_indx<this->nlist_num[j]; k_indx++) {
                 k = this->nlist[j][k_indx]-1;
                 if(k==i) {
@@ -265,7 +268,7 @@ double ldpc::decoder::get_awrm(void) const {
         ret += e_i;
     }
     
-    return ret/this->M;
+    return ret/static_cast<double>(this->M);
 }
 
 ldpc::softbit_t ldpc::decoder::llrdiff(const ldpc::softbit_t a, const ldpc::softbit_t b) const {
@@ -357,7 +360,6 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
     double awrm_min = 0.0;
 #endif
     
-    softbit_t bits_last_it[this->M];
     std::memcpy(bits_last_it, input, this->M*sizeof(softbit_t));
     softbit_t tmp_softbit, delta_bits_sum;
     
@@ -550,7 +552,7 @@ bool ldpc::decoder::decode(softbit_t *out, const softbit_t *input, metadata_t *m
             out[j++] = tmp_bit;
         }
         
-        ber_counter += (!this->punctconf->is_punctured(i,this->M) && input[i]*tmp_bit<0.0f) ? 1 : 0;
+        ber_counter += (!this->punctconf->is_punctured(i,this->M) && input[i]*tmp_bit<0.0f) ? 1u : 0u;
     }
     
     uint8_t fail_flags = NONE;
@@ -641,7 +643,7 @@ void ldpc::decoder::bit_node::reset(softbit_t channel_val) {
         this->check_values[i] = 0.0f;
     }
     
-    this->final_value = nan(""); // mark value as unset
+    this->final_value = static_cast<softbit_t>(nan("")); // mark value as unset
 }
 
 void ldpc::decoder::bit_node::new_round(void) {
@@ -652,7 +654,7 @@ void ldpc::decoder::bit_node::new_round(void) {
     }
 #endif
 
-    this->final_value = nan(""); // mark value as unset
+    this->final_value = static_cast<softbit_t>(nan("")); // mark value as unset
     this->tmp_indx = 0;
 }
 
@@ -713,15 +715,18 @@ void ldpc::decoder::bit_node::llrsum_add(llrsum_t *l, softbit_t val) const {
 }
         
 ldpc::softbit_t ldpc::decoder::bit_node::llrsum_get(llrsum_t *l) const {
+    //Asserts floating point compatibility at compile time
+    static_assert(std::numeric_limits<float>::is_iec559, "IEEE 754 required for +/- Infitinty floats");
+    
     if(l->inf_count == 0) {
         // Finite
         return l->fin_sum;
     } else if(l->inf_count > 0) {
         // + Inf
-        return 1.0f/0.0f;
+        return std::numeric_limits<float>::infinity();
     } else {
         // - Inf
-        return -1.0f/0.0f;
+        return -std::numeric_limits<float>::infinity();
     }
 }
 

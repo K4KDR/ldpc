@@ -59,7 +59,6 @@ template <typename T> std::vector<T> parse_digits_from_line(FILE *f, const char 
     return ret;
 }
 
-typedef unsigned long val_t;
 
 void compute_generator(NTL::Mat<NTL::GF2> &G, const char* alist_file) {
     NTL::Mat<NTL::GF2> Q, P;
@@ -79,57 +78,60 @@ void compute_generator(NTL::Mat<NTL::GF2> &G, const char* alist_file) {
         exit( EXIT_FAILURE );
     }
     
-    std::vector<val_t> buf;
-    std::vector<val_t> num_n, num_m;
+    std::vector<size_t> buf;
+    std::vector<size_t> num_n, num_m;
     
     // Read N M
-    buf = parse_digits_from_line<val_t>(f, "dimensions", 2, false);
+    buf = parse_digits_from_line<size_t>(f, "dimensions", 2, false);
     
-    const val_t alist_N = buf[0];
-    const val_t alist_M = buf[1];
+    const size_t alist_N = buf[0];
+    const size_t alist_M = buf[1];
     
     bool do_trans = (alist_N > alist_M);
     
-    const val_t N = do_trans ? alist_M : alist_N;
-    const val_t M = do_trans ? alist_N : alist_M;
+    const size_t N = do_trans ? alist_M : alist_N;
+    const size_t M = do_trans ? alist_N : alist_M;
     
     if(N > M) {
         error("Transpose logic failed.");
     }
     
-    const val_t K = M-N;
-    Q.SetDims(N, K);
-    P.SetDims(N, N);
+    const size_t K = M-N;
+    Q.SetDims(static_cast<long>(N), static_cast<long>(K));
+    P.SetDims(static_cast<long>(N), static_cast<long>(N));
     
     
     // Read biggest_num_n biggest_num_m (ignored)
-    buf = parse_digits_from_line<val_t>(f, "maximum elements", 2, false);
+    buf = parse_digits_from_line<size_t>(f, "maximum elements", 2, false);
     
     // Read num_n
-    num_n = parse_digits_from_line<val_t>(f, "nlist count", alist_N , false);
+    num_n = parse_digits_from_line<size_t>(f, "nlist count", alist_N , false);
     
     // Read num_m
-    num_m = parse_digits_from_line<val_t>(f, "mlist count", alist_M , false);
+    num_m = parse_digits_from_line<size_t>(f, "mlist count", alist_M , false);
     
     // If we have to transpose, skip nlist
     if(do_trans) {
         for(size_t i=0; i<alist_N ;i++) {
-            buf = parse_digits_from_line<val_t>(f, "nlist", num_n[i], true);
+            buf = parse_digits_from_line<size_t>(f, "nlist", num_n[i], true);
         }
         num_n = num_m;
     }
     
     // Now read either nlist or mlist as new nlist (num_n was updated before)
     for(size_t i=0; i<N ;i++) {
-        buf = parse_digits_from_line<val_t>(f, "n/m-list", num_n[i], true);
+        buf = parse_digits_from_line<size_t>(f, "n/m-list", num_n[i], true);
+        const long i_long = static_cast<long>(i);
         
         for(size_t j=0; j<num_n[i]; j++) {
             if(buf[j] <= K) {
                 // Entry belongs to Q matrix
-                Q[i][buf[j]-1] = 1;
+                const long Q_indx_long = static_cast<long>(buf[j]-1u);
+                Q[i_long][Q_indx_long] = 1;
             } else {
                 // Entry belongs to P matrix
-                P[i][buf[j]-K-1] = 1;
+                const long P_indx_long = static_cast<long>(buf[j]-K-1u);
+                P[i_long][P_indx_long] = 1;
             }
         }
     }
@@ -137,7 +139,7 @@ void compute_generator(NTL::Mat<NTL::GF2> &G, const char* alist_file) {
     // If we have not transposed, read mlist now
     if(!do_trans) {
         for(size_t i=0; i<alist_M ;i++) {
-            buf = parse_digits_from_line<val_t>(f, "mlist", num_m[i], true);
+            buf = parse_digits_from_line<size_t>(f, "mlist", num_m[i], true);
         }
     }
     
@@ -185,11 +187,11 @@ void compute_generator(NTL::Mat<NTL::GF2> &G, const char* alist_file) {
 }
 
 void write_matrix_txt(FILE *out, NTL::Mat<NTL::GF2> &G) {
-    const val_t N = G.NumRows();
-    const val_t K = G.NumCols();
+    const long N = G.NumRows();
+    const long K = G.NumCols();
     
-    for(size_t i=0; i<N; i++) {
-        for(size_t j=0; j<K; j++) {
+    for(long i=0; i<N; i++) {
+        for(long j=0; j<K; j++) {
             fprintf(out, "%1d ", NTL::IsOne(G[i][j]) ? 1 : 0);
         }
         fprintf(out, "\n");
@@ -199,13 +201,23 @@ void write_matrix_txt(FILE *out, NTL::Mat<NTL::GF2> &G) {
 void write_matrix_bin(FILE *out, NTL::Mat<NTL::GF2> &G) {
     
     // G is a NxK matrix
-    const val_t N = G.NumRows();
-    const val_t K = G.NumCols();
+    const long N = G.NumRows();
+    const long K = G.NumCols();
+    
+    if (N<0l) {
+        fprintf(stderr, "Number of rows in G is negative.\n");
+        exit( EXIT_FAILURE );
+    }
+    
+    if (K<0l) {
+        fprintf(stderr, "Number of columns in G is negative.\n");
+        exit( EXIT_FAILURE );
+    }
     
     if(K%8 != 0) {
         error("Number of information bits is not a multiple of 8 bit. Cannot write binary compressed form.");
     }
-    const val_t num_bytes = K/8;
+    const long num_bytes = K/8;
     uint8_t buf[8];
     uint8_t tmp;
     
@@ -234,10 +246,10 @@ void write_matrix_bin(FILE *out, NTL::Mat<NTL::GF2> &G) {
     printf("K = %lu = %2X%2X%2X%2X%2X%2X%2X%2X\n", K, buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
     
     // Write byte masks
-    for(size_t i=0; i<N; i++) {
+    for(long i=0; i<N; i++) {
         
         // Write mask for parity check i
-        for(size_t j=0; j<num_bytes; j++) {
+        for(long j=0; j<num_bytes; j++) {
             
             // Write j-th byte mask of parity check i
             tmp = 0x00;
@@ -248,7 +260,7 @@ void write_matrix_bin(FILE *out, NTL::Mat<NTL::GF2> &G) {
                     // if k-th bit (0:MSB, 7:LSB) is one, set it in mask
                     
                     // Set bit to one
-                    tmp = 0x01 << (7-k);
+                    tmp = static_cast<uint8_t>(0x01u << (7u-k));
                     
                     // Toggle bit in buffer
                     buf[0] ^= tmp;

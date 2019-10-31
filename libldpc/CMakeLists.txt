@@ -24,6 +24,15 @@ target_include_directories(libldpc
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+# Set compiler to strict mode when compiling this binary
+target_compile_options(libldpc
+    PRIVATE
+        $<$<OR:$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>,$<C_COMPILER_ID:GNU>>:
+            -Werror -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion>
+        $<$<C_COMPILER_ID:MSVC>:
+            /WX /W4>
+)
+
 ##############################################
 # Installation instructions
 

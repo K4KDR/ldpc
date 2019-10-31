@@ -49,11 +49,13 @@ namespace ldpc {
         check_node **check_nodes;
         bit_node **bit_nodes;
         
+        softbit_t *bits_last_it;
+        
     public:
         decoder(const char* alist_file, systematic::systematic_t systype, puncturing::conf_t *punctconf);
         ~decoder();
         
-        enum fail_t { NONE=0x00, MAX_ITERATIONS=(0x01<<0), AWRM_STOP=(0x01<<1), NO_SOFTBITS_CHANGE=(0x01<<2) };
+        enum fail_t : uint8_t { NONE=0x00, MAX_ITERATIONS=(0x01<<0), AWRM_STOP=(0x01<<1), NO_SOFTBITS_CHANGE=(0x01<<2) };
         
         struct metadata_t {
             /** Number of decoding iterations */

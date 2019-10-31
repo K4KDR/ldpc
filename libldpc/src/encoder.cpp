@@ -48,8 +48,8 @@ encoder::encoder(const char* generator_file, systematic::systematic_t systype, p
     }
     
     this->N_punct = this->N - punctconf->num_punct;
-    this->N_punct_bytes = (uint64_t) ceil(this->N_punct/8.0);
-    this->K_bytes = (uint64_t) ceil(this->K/8.0);
+    this->N_punct_bytes = static_cast<uint64_t>(ceil(static_cast<double>(this->N_punct)/8.0));
+    this->K_bytes = static_cast<uint64_t>(ceil(static_cast<double>(this->K)/8.0));
     
     uint8_t buf;
     this->parity_checks = new uint8_t*[this->N_punct];
@@ -143,17 +143,17 @@ uint8_t encoder::read_byte(FILE *fp, const char *descr) {
 }
 
 bool encoder::byte_parity(uint8_t byte) {
-    uint8_t par = 0;
+    uint8_t par = 0u;
     
-    for(uint8_t i=0; i<8; i++) {
-        par ^= ( 0x01 & (byte>>i));
+    for(uint8_t i=0u; i<8u; i++) {
+        par ^= static_cast<uint8_t>( 0x01u & static_cast<uint8_t>(byte>>i));
     }
     
-    return (par > 0);
+    return (par > 0u);
 }
 
 void encoder::modify_bit(uint8_t *byte, uint8_t pos, bool value) {
-    uint8_t buf = (0x01 << (7-pos)); // one at pos
+    uint8_t buf = static_cast<uint8_t>(0x01u << (7u-pos)); // one at pos
     
     if(value) {
         *byte |= buf; // Set to one, by OR
