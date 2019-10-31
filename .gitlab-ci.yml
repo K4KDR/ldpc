@@ -11,8 +11,19 @@ variables:
     stage: Compile
     script:
         - mkdir build && cd build
+        - echo "Enable build generator is ${BUILD_GENERATOR}"
         - cmake -DLIBLDPC_BUILD_GENERATOR=${BUILD_GENERATOR} -DLIBLDPC_UNITTESTS=Off ../
         - make
+    variables:
+        BUILD_GENERATOR: "Off"
+
+.tmpl_enable_generator: &tmpl_enable_generator
+    before_script:
+        - apt-get update
+        - apt-get --no-install-recommends install -y libntl-dev
+    variables:
+        BUILD_GENERATOR: "On"
+
 
 
 ########################################################################################################################
@@ -21,27 +32,21 @@ variables:
 #####
 ########################################################################################################################
 
-Compile-Clang-with-gen:
+Clang (Alpine):
     <<: *tmpl_build
+    image: "${IMAGE_PREFIX}alpine-clang"
+
+Clang + Generator (Ubuntu):
+    <<: *tmpl_build
+    <<: *tmpl_enable_generator
     image: "${IMAGE_PREFIX}ubuntu-clang"
-    variables:
-        BUILD_GENERATOR: "On"
 
-Compile-Clang-without-gen:
+GCC (Alpine):
     <<: *tmpl_build
-    image: "${IMAGE_PREFIX}ubuntu-clang"
-    variables:
-        BUILD_GENERATOR: "Off"
+    image: "${IMAGE_PREFIX}alpine-gcc"
 
-Compile-GCC-with-gen:
+GCC + Generator (Ubuntu):
     <<: *tmpl_build
+    <<: *tmpl_enable_generator
     image: "${IMAGE_PREFIX}ubuntu-gcc"
-    variables:
-        BUILD_GENERATOR: "On"
-
-Compile-GCC-without-gen:
-    <<: *tmpl_build
-    image: "${IMAGE_PREFIX}ubuntu-gcc"
-    variables:
-        BUILD_GENERATOR: "Off"
 
