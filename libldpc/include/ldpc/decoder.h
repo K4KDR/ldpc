@@ -1,6 +1,7 @@
 #ifndef __LIBLDPC_DECODER_H__DEFINED__
 #define __LIBLDPC_DECODER_H__DEFINED__
 
+#include <ldpc/ldpc_export.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <ldpc/ldpc.h>
@@ -23,11 +24,11 @@
 
 namespace ldpc {
     
-    class decoder {
+    class LDPC_EXPORT decoder {
     private:
-        class check_node;
-        class bit_node;
-        class guess_tree;
+        class LDPC_EXPORT check_node;
+        class LDPC_EXPORT bit_node;
+        class LDPC_NO_EXPORT guess_tree;
 
         /** Number of parity checks without puncturing */
         uint64_t N;
@@ -108,7 +109,7 @@ namespace ldpc {
         
     };
     
-    class decoder::guess_tree {
+    class LDPC_NO_EXPORT decoder::guess_tree {
     public:
         guess_tree *parent;
         uint64_t level;
@@ -135,7 +136,7 @@ namespace ldpc {
         std::string get_str(void);
     };
     
-    class decoder::check_node {
+    class LDPC_EXPORT decoder::check_node {
     public:
         const uint64_t NUM_BITS;
         softbit_t *bit_values_tanh;
@@ -149,7 +150,7 @@ namespace ldpc {
         void set_bit_value(softbit_t val); // Set a new bit value at tmp_indx
     };
     
-    class decoder::bit_node {
+    class LDPC_EXPORT decoder::bit_node {
     public:
         const uint64_t NUM_CHECKS;
         softbit_t *check_values;
@@ -188,9 +189,6 @@ namespace ldpc {
         
         /** Return sum as softbit */
         softbit_t llrsum_get(llrsum_t *l) const;
-        
-        
-        
     };
     
 }

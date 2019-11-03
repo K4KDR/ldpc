@@ -1,12 +1,13 @@
 #ifndef __LIBLDPC_ENCODER_H__DEFINED__
 #define __LIBLDPC_ENCODER_H__DEFINED__
 
+#include <ldpc/ldpc_export.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <ldpc/ldpc.h>
 
 namespace ldpc {
-    class encoder {
+    class LDPC_EXPORT encoder {
     private:
         uint64_t N;
         uint64_t K;
