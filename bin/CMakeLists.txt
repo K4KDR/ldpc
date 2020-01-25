@@ -7,9 +7,7 @@ option (LDPC_BUILD_GENERATOR "Build the ldpc_compute_generator binary (requires 
 if (LDPC_BUILD_GENERATOR)
 	message(STATUS "Optional ldpc_compute_generator binary will be build. Disable this with -DLIBLDPC_BUILD_GENERATOR=Off")
 
-	find_package(NTL 9.3.0 REQUIRED MODULE)
-	find_package(GMP REQUIRED) # required by NTL, but not added to their public interface
-	
+	find_package(NTL REQUIRED MODULE)
 	
 	add_executable(ldpc_compute_generator ldpc_compute_generator.cpp)
 	target_link_libraries(ldpc_compute_generator NTL::NTL)
