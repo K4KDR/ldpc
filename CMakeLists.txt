@@ -7,9 +7,9 @@ set(CMAKE_MODULE_PATH $7CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 add_subdirectory(libldpc)
 add_subdirectory(bin)
 
-option(LIBLDPC_UNITTESTS "Enable unittests" Off)
+option(LDPC_UNITTESTS "Enable unittests" Off)
 
-if(LIBLDPC_UNITTESTS)
+if(LDPC_UNITTESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()

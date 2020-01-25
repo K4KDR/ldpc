@@ -5,7 +5,7 @@
 option (LDPC_BUILD_GENERATOR "Build the ldpc_compute_generator binary (requires NTL)" OFF)
 
 if (LDPC_BUILD_GENERATOR)
-	message(STATUS "Optional ldpc_compute_generator binary will be build. Disable this with -DLIBLDPC_BUILD_GENERATOR=Off")
+	message(STATUS "Optional ldpc_compute_generator binary will be build. Disable this with -DLDPC_BUILD_GENERATOR=Off")
 
 	find_package(NTL REQUIRED MODULE)
 	
@@ -22,5 +22,5 @@ if (LDPC_BUILD_GENERATOR)
                 /WX /W4>
     )
 else()
-	message(STATUS "Optional ldpc_compute_generator binary is not build. Enable this with -DLIBLDPC_BUILD_GENERATOR=On")
+	message(STATUS "Optional ldpc_compute_generator binary is not build. Enable this with -DLDPC_BUILD_GENERATOR=On")
 endif()
