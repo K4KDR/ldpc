@@ -12,6 +12,9 @@ target_link_libraries(test_chain libldpc)
 add_executable(test_benchmark test_benchmark.cpp)
 target_link_libraries(test_benchmark libldpc)
 
+add_executable(ber_simulation ber_simulation.cpp)
+target_link_libraries(ber_simulation libldpc)
+
 
 add_test(TestEncoder test_encoder)
 add_test(TestDecoder test_decoder)
